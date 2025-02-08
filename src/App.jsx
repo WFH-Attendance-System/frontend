@@ -1,8 +1,11 @@
 // import useAuth from '@/hooks/useAuth';
 import { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { Protected } from "@/components";
+import { DashboardLayouts } from "@/layouts";
+
 import "./App.css";
-import { Login, Dashboard, Error404, Employee, Attendance } from "@/pages";
+import { Login, Logout, Dashboard, Error404, Employee, Attendance } from "@/pages";
 
 function App() {
     // const { isAuthenticated } = useAuth();
@@ -10,11 +13,34 @@ function App() {
     return (
         <>
             <Routes>
-                <Route path="/" element={<Navigate to="/login" />} />
+                <Route
+                    index
+                    element={
+                        /*   isAuthenticated ? (
+                            <Navigate to="/dashboard" replace />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        ) */
+                        <Navigate to="/dashboard" replace />
+                    }
+                />
+
                 <Route path="/login" element={<Login />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/employee" element={<Employee />} />
-                <Route path="/attendance" element={<Attendance />} />
+                <Route path="/logout" element={<Logout />} />
+
+                <Route
+                    path="/"
+                    element={
+                        <Protected>
+                            <DashboardLayouts />
+                        </Protected>
+                    }
+                >
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/employee" element={<Employee />} />
+                    <Route path="/attendance" element={<Attendance />} />
+                </Route>
+
                 <Route path="*" element={<Error404 />} />
             </Routes>
         </>
