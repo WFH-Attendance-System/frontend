@@ -5,6 +5,7 @@ import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import useTitle from "@/hooks/useTitle";
 
 import { ImageUpload } from "@/components";
 
@@ -29,6 +30,7 @@ function dataCard(title, time = null) {
 
 function Dashboard() {
     const today = new Date();
+    const { setTitle } = useTitle();
     const [uploadedImageTime, setUploadedImageTime] = useState(null);
     const [checkinTime, setCheckinTime] = useState(null);
     const [checkoutTime, setCheckoutTime] = useState(null);
@@ -48,9 +50,10 @@ function Dashboard() {
     };
 
     useEffect(() => {
+        setTitle('Dashboard');
         const list = [];
         setAttendanceList(list);
-    });
+    }, []);
 
     return (
         <Row style={{ rowGap: "1rem" }}>

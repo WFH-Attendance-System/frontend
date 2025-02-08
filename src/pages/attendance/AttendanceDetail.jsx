@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import useTitle from "@/hooks/useTitle";
 
-function Attendance() {
+function AttendanceDetail() {
     const { setTitle } = useTitle();
 
     useEffect(() => {
         setTitle('Daftar Kehadiran');
     }, []);
 
-    return "Attendance";
+    return "AttendanceDetail";
 }
 
-export default Attendance;
+export default AttendanceDetail;

@@ -7,6 +7,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
+import { NavbarLogo } from "@/components";
 
 function Sidebar() {
     const navigation = [
@@ -21,12 +22,7 @@ function Sidebar() {
         <>
             <Navbar style={{ height: "50px" }}>
                 <Container>
-                    <Link
-                        to="/"
-                        className="d-flex align-items-center text-white text-decoration-none"
-                    >
-                        <span>Attendance</span>
-                    </Link>
+                    <NavbarLogo />
                 </Container>
             </Navbar>
             <hr className="mt-0" />
@@ -36,7 +32,9 @@ function Sidebar() {
                         <Link
                             to={item.href}
                             className={`nav-link text-white ${
-                                location.pathname === item.href ? "active" : ""
+                                location.pathname.startsWith(item.href)
+                                    ? "active"
+                                    : ""
                             }`}
                         >
                             <FontAwesomeIcon

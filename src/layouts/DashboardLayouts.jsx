@@ -2,21 +2,11 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar, Navbar } from "@/components";
 import Container from "react-bootstrap/Container";
 import { useEffect, useState } from "react";
+import useTitle from "@/hooks/useTitle";
 
 function DashboardLayouts() {
-    const location = useLocation();
-
+    const { title } = useTitle();
     const [isOpenSidebar, setIsOpenSidebar] = useState(true);
-    const pageTitles = {
-        "/dashboard": "Dashboard",
-        "/employee": "Karyawan",
-        "/attendance": "Daftar Presensi Karyawan",
-    };
-
-    const pageTitle = pageTitles[location.pathname] || "WFH Attendance App";
-    useEffect(() => {
-        document.title = `${pageTitle}`;
-    }, [location.pathname]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -53,8 +43,7 @@ function DashboardLayouts() {
                 />
 
                 <Container>
-                    <h1 className="fs-3 fw-semibold">{pageTitle}</h1>
-
+                    <h1 className="fs-3 fw-semibold">{title}</h1>
                     <Outlet />
                 </Container>
             </main>

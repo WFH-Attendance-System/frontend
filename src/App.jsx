@@ -1,14 +1,24 @@
-// import useAuth from '@/hooks/useAuth';
-import { useState } from "react";
+import useAuth from '@/hooks/useAuth';
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Protected } from "@/components";
 import { DashboardLayouts } from "@/layouts";
 
 import "./App.css";
-import { Login, Logout, Dashboard, Error404, Employee, Attendance } from "@/pages";
+import {
+    Login,
+    Logout,
+    Dashboard,
+    Error404,
+    Employee,
+    EmployeeCreate,
+    EmployeeDetail,
+    EmployeeEdit,
+    Attendance,
+    AttendanceDetail,
+} from "@/pages";
 
 function App() {
-    // const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
 
     return (
         <>
@@ -16,12 +26,11 @@ function App() {
                 <Route
                     index
                     element={
-                        /*   isAuthenticated ? (
+                        isAuthenticated ? (
                             <Navigate to="/dashboard" replace />
                         ) : (
                             <Navigate to="/login" replace />
-                        ) */
-                        <Navigate to="/dashboard" replace />
+                        )
                     }
                 />
 
@@ -38,7 +47,20 @@ function App() {
                 >
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/employee" element={<Employee />} />
+                    <Route
+                        path="/employee/create"
+                        element={<EmployeeCreate />}
+                    />
+                    <Route path="/employee/:id" element={<EmployeeDetail />} />
+                    <Route
+                        path="/employee/:id/edit"
+                        element={<EmployeeEdit />}
+                    />
                     <Route path="/attendance" element={<Attendance />} />
+                    <Route
+                        path="/attendance/:id"
+                        element={<AttendanceDetail />}
+                    />
                 </Route>
 
                 <Route path="*" element={<Error404 />} />
