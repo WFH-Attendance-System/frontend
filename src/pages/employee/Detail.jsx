@@ -11,7 +11,7 @@ function Detail() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const status = !employee.is_active ? " (Non-Aktif)" : null;
+        const status = !employee.is_active ? " (Non-Aktif)" : "";
         setTitle(
             "Detail Karyawan - " + (employee?.name || "Loading...") + status
         );
