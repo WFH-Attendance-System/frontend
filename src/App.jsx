@@ -13,8 +13,8 @@ import {
     EmployeeCreate,
     EmployeeDetail,
     EmployeeEdit,
+    EmployeeDelete,
     Attendance,
-    AttendanceDetail,
 } from "@/pages";
 
 function App() {
@@ -56,11 +56,11 @@ function App() {
                         path="/employee/:id/edit"
                         element={<EmployeeEdit />}
                     />
-                    <Route path="/attendance" element={<Attendance />} />
                     <Route
-                        path="/attendance/:id"
-                        element={<AttendanceDetail />}
+                        path="/employee/:id/delete"
+                        element={<EmployeeDelete />}
                     />
+                    <Route path="/attendance" element={<Attendance />} />
                 </Route>
 
                 <Route path="*" element={<Error404 />} />

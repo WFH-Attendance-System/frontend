@@ -1,37 +1,39 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import useTitle from "@/hooks/useTitle";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import useAuth from "@/hooks/useAuth";
+import useTitle from "@/hooks/useTitle";
+import { VITE_API_URL } from "@/utils/constants";
 
 function Employee() {
     const { setTitle } = useTitle();
     const [employee, setEmployee] = useState([]);
+    const { token } = useAuth();
 
     useEffect(() => {
         setTitle("Daftar Karyawan");
-        const list = [
-            {
-                id: 1,
-                name: "John Doe",
-                dept: "IT",
-            },
-            {
-                id: 2,
-                name: "Jane",
-                dept: "IT",
-            },
-            {
-                id: 3,
-                name: "Doe",
-                dept: "IT",
-            },
-        ];
-        setEmployee(list);
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${VITE_API_URL}/api/users/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                const { data } = response.data;
+                setEmployee(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchData();
     }, []);
 
     return (
@@ -52,7 +54,7 @@ function Employee() {
 
                             <div>
                                 <Card.Title>{item.name}</Card.Title>
-                                <Card.Text>{item.dept}</Card.Text>
+                                <Card.Text>{item.department_name}</Card.Text>
                             </div>
 
                             <div
