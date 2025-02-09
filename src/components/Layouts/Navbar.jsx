@@ -1,9 +1,17 @@
-import { Container, Navbar as NavbarBootstrap } from "react-bootstrap";
+import {
+    Container,
+    Navbar as NavbarBootstrap,
+    NavDropdown,
+} from "react-bootstrap";
+import { Navigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import useAuth from "@/hooks/useAuth";
 
 function Navbar({ isOpenSidebar, setIsOpenSidebar }) {
+    const { user } = useAuth();
+
     return (
         <>
             <NavbarBootstrap
@@ -18,7 +26,13 @@ function Navbar({ isOpenSidebar, setIsOpenSidebar }) {
                     >
                         <FontAwesomeIcon icon={faBars} />
                     </button>
-                    <span>Profil</span>
+                    <NavDropdown
+                        title={user.name}
+                        align="end"
+                        id="basic-nav-dropdown"
+                    >
+                        <NavDropdown.Item href="logout">Logout</NavDropdown.Item>
+                    </NavDropdown>
                 </Container>
             </NavbarBootstrap>
             <hr className="mt-0" />

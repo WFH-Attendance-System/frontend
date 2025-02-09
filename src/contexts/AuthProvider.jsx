@@ -16,8 +16,7 @@ export const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
-    const [authResErrors, setAuthResErrors] = useState(null);
-    const [userId, setUserId] = useState(null);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -30,27 +29,18 @@ const AuthProvider = ({ children }) => {
         try {
             const response = await api.get(`/api/auth/refresh-token`);
             if (response.status === 200) {
-                // save userId on mount for cases when user closes or reloads page but not logged-off
-                if (!userId) setUserId(jwtDecode(response.data.token).id);
+                if (!user) setUser(jwtDecode(response.data.token));
 
                 setToken(response.data.token);
-                setAuthResErrors(null);
             } else {
                 setToken(null);
-                setAuthResErrors(response.data);
             }
         } catch {
             setToken(null);
-            setAuthResErrors({
-                code: 500,
-                data: null,
-                message: "something went wrong!",
-                status: false,
-            });
         } finally {
             setLoading(false);
         }
-    }, [api, setToken, setAuthResErrors, setLoading, userId]);
+    }, [api, setToken, setLoading, user]);
 
     useEffect(() => {
         if (!token) refreshToken();
@@ -64,24 +54,18 @@ const AuthProvider = ({ children }) => {
             // Handle successful login
             if (response.status === 200) {
                 setToken(response.data.data.token);
-                setUserId(response.data.data.user_id);
-                setAuthResErrors(null);
+                const userData = jwtDecode(response.data.data.token);
+
+                setUser(userData);
                 navigate(onSuccess, { replace: true });
             } else {
                 setToken(null);
-                setAuthResErrors({
-                    code: response.status,
-                    data: response.data,
-                    message: "Something went wrong!",
-                    status: false,
-                });
                 navigate(onError, { replace: true });
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
                 if (error.response.status === 400) {
                     setToken(null);
-                    setAuthResErrors(error.response.data);
                     navigate(onError, { replace: true });
                     alert(
                         error.response.data.message ||
@@ -89,12 +73,6 @@ const AuthProvider = ({ children }) => {
                     );
                 } else {
                     setToken(null);
-                    setAuthResErrors({
-                        code: error.response.status,
-                        data: error.response.data,
-                        message: "Something went wrong!",
-                        status: false,
-                    });
                     navigate(onError, { replace: true });
                     alert(
                         "An error occurred: " +
@@ -103,12 +81,6 @@ const AuthProvider = ({ children }) => {
                 }
             } else {
                 setToken(null);
-                setAuthResErrors({
-                    code: 500,
-                    data: null,
-                    message: "Something went wrong!",
-                    status: false,
-                });
                 navigate(onError, { replace: true });
                 alert(
                     "Network error: " + error.message ||
@@ -120,24 +92,17 @@ const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
-        setToken(null);
-    };
-
     return loading ? (
         <Loading size="5vw" bgSize="100vh" />
     ) : (
         <AuthContext.Provider
             value={{
                 login,
-                logout,
                 setLoading,
-                authResErrors,
-                setAuthResErrors,
                 isAuthenticated: !!token,
-                userId,
+                user,
                 token,
-                refreshToken,
+                setToken,
                 api,
             }}
         >
