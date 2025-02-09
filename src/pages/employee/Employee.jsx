@@ -53,7 +53,14 @@ function Employee() {
                             </div>
 
                             <div>
-                                <Card.Title>{item.name}</Card.Title>
+                                <Card.Title>
+                                    {item.name}
+                                    <span className="text-muted fs-6">
+                                        {!item.is_active
+                                            ? " (Non-Aktif)"
+                                            : null}
+                                    </span>
+                                </Card.Title>
                                 <Card.Text>{item.department_name}</Card.Text>
                             </div>
 

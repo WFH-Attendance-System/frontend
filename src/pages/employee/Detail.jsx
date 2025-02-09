@@ -10,7 +10,10 @@ function Detail() {
     const [employee, setEmployee] = useState({});
 
     useEffect(() => {
-        setTitle("Detail Karyawan - " + (employee?.name || "Loading..."));
+        const status = !employee.is_active ? " (Non-Aktif)" : null;
+        setTitle(
+            "Detail Karyawan - " + (employee?.name || "Loading...") + status
+        );
     }, [employee]);
 
     return (
@@ -44,7 +47,7 @@ function Detail() {
                         </Card.Text>
                         <Card.Text>
                             <strong>Status Karyawan:</strong>{" "}
-                            {employee.is_active ? "Aktif" : "Tidak Aktif"}
+                            {employee.is_active ? "Aktif" : "Non-Aktif"}
                         </Card.Text>
                         <div
                             className="d-flex flex-row"
@@ -55,13 +58,13 @@ function Detail() {
                                     Ubah Data Karyawan
                                 </Button>
                             </Link>
-                            {employee.is_active && (
+                            {employee.is_active ? (
                                 <Link to={`/employee/${employee.id}/delete`}>
                                     <Button variant="danger">
                                         Non-aktifkan Karyawan
                                     </Button>
                                 </Link>
-                            )}
+                            ) : null}
                         </div>
                     </div>
                 </Card.Body>
