@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
 import EmployeeDetail from "@/components/Employee/EmployeeDetail";
 import Card from "react-bootstrap/Card";
@@ -8,6 +8,7 @@ import { Button } from "react-bootstrap";
 function Detail() {
     const { setTitle } = useTitle();
     const [employee, setEmployee] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         const status = !employee.is_active ? " (Non-Aktif)" : null;
@@ -59,11 +60,24 @@ function Detail() {
                                 </Button>
                             </Link>
                             {employee.is_active ? (
-                                <Link to={`/employee/${employee.id}/delete`}>
-                                    <Button variant="danger">
-                                        Non-aktifkan Karyawan
-                                    </Button>
-                                </Link>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => {
+                                        const confirmation = confirm(
+                                            "Apakah Anda yakin ingin menon-aktifkan karyawan ini?"
+                                        );
+
+                                        if (confirmation) {
+                                            navigate(
+                                                `/employee/${employee.id}/delete`
+                                            );
+                                        }
+
+                                        return;
+                                    }}
+                                >
+                                    Non-aktifkan Karyawan
+                                </Button>
                             ) : null}
                         </div>
                     </div>
