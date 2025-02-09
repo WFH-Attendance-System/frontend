@@ -1,4 +1,4 @@
-import { formatDate, formatDateTime } from "@/utils/formatter";
+import { formatDate, formatDateApi, formatDateTime } from "@/utils/formatter";
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -6,8 +6,12 @@ import Table from "react-bootstrap/Table";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import useTitle from "@/hooks/useTitle";
+import useAuth from "@/hooks/useAuth";
 
 import { ImageUpload } from "@/components";
+import axios from "axios";
+
+import { VITE_API_URL } from "@/utils/constants";
 
 function dataCard(title, time = null) {
     return (
@@ -31,6 +35,8 @@ function dataCard(title, time = null) {
 function Dashboard() {
     const today = new Date();
     const { setTitle } = useTitle();
+    const { token, user } = useAuth();
+
     const [uploadedImageTime, setUploadedImageTime] = useState(null);
     const [checkinTime, setCheckinTime] = useState(null);
     const [checkoutTime, setCheckoutTime] = useState(null);
@@ -39,20 +45,69 @@ function Dashboard() {
 
     const [attendanceList, setAttendanceList] = useState([]);
 
-    const handleCheckInOut = () => {
-        if (!checkinTime) {
-            setCheckinTime(uploadedImageTime);
-        } else if (!checkoutTime) {
-            setCheckoutTime(uploadedImageTime);
+    const handleCheckInOut = async () => {
+        const formData = new FormData();
+        formData.append("photo", image);
+        formData.append("created_date", formatDateApi(uploadedImageTime));
+
+        try {
+            const response = await axios.post(
+                `${VITE_API_URL}/api/attendance/`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            const { data } = response.data;
+            setCheckinTime(data.check_in_time);
+            setCheckoutTime(data.check_out_time);
+
+            alert("Berhasil melakukan check in/out");
+
+            setImage(null);
+            setPreviewStatus(false);
+        } catch (error) {
+            console.error(error);
+            alert(error.response?.data?.message || "Terjadi kesalahan");
         }
-        setImage(null);
-        setPreviewStatus(false);
     };
 
     useEffect(() => {
-        setTitle('Dashboard');
-        const list = [];
-        setAttendanceList(list);
+        setTitle("Dashboard");
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(
+                    `${VITE_API_URL}/api/attendances/`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        params: {
+                            userId: user.id,
+                            latest: true,
+                        },
+                    }
+                );
+
+                const { data } = response.data;
+                setAttendanceList(data);
+                if (
+                    data[0] &&
+                    new Date(data[0].check_in_time).getDay() == today.getDay()
+                ) {
+                    setCheckinTime(data[0].check_in_time);
+                    setCheckoutTime(data[0].check_out_time);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
     }, []);
 
     return (
@@ -109,12 +164,12 @@ function Dashboard() {
                                                     <td>{index + 1}</td>
                                                     <td>
                                                         {formatDateTime(
-                                                            attendance.checkin
+                                                            attendance.check_in_time
                                                         )}
                                                     </td>
                                                     <td>
                                                         {formatDateTime(
-                                                            attendance.checkout
+                                                            attendance.check_out_time
                                                         )}
                                                     </td>
                                                 </tr>

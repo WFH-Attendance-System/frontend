@@ -1,5 +1,4 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
 class Api {
     constructor(baseUrl, token, setToken, navigate) {
@@ -20,19 +19,18 @@ class Api {
             async (err) => {
                 if (axios.isAxiosError(err) && err.response) {
                     const originalConfig = err.config;
-
                     // retry request when status is 401
                     if (err.response.status === 401 && !originalConfig._retry) {
                         // attach access token when response error data is unauthorized (indicates resource requires access token, but token is not present) and token exists
                         if (
-                            err.response.data.error === "unauthorized" &&
+                            err.response.data.message === "Unauthorized" &&
                             this.token
                         ) {
                             return customAxios({
                                 ...originalConfig,
                                 headers: {
                                     ...originalConfig.headers,
-                                    Authorization: `Bearer ${this.token}`,
+                                    Authorization: ` Bearer ${this.token}`,
                                 },
                             });
                         }
@@ -40,29 +38,19 @@ class Api {
                         // else indicates expired access token, continue to refresh access token
                         originalConfig._retry = true;
                         try {
-                            const refreshToken = Cookies.get("refresh-token");
-                            if (
-                                refreshToken &&
-                                refreshToken.split(".").length === 3
-                            ) {
-                                const res = await customAxios.get(
-                                    `/api/refresh-token?refresh_token=${refreshToken}`
-                                );
-                                Cookies.set(
-                                    "refresh-token",
-                                    res.data.refresh_token
-                                );
-                                this.setToken(res.data.access_token);
+                            const res = await customAxios.get(
+                                `/api/auth/refresh-token`
+                            );
+                            this.setToken(res.data.access_token);
 
-                                // retry the original request with new access token
-                                return customAxios({
-                                    ...originalConfig,
-                                    headers: {
-                                        ...originalConfig.headers,
-                                        Authorization: `Bearer ${res.data.access_token}`,
-                                    },
-                                });
-                            }
+                            // retry the original request with new access token
+                            return customAxios({
+                                ...originalConfig,
+                                headers: {
+                                    ...originalConfig.headers,
+                                    Authorization: `Bearer ${res.data.access_token}`,
+                                },
+                            });
                         } catch (err) {
                             console.error(
                                 "Error refreshing access token: ",

@@ -5,7 +5,7 @@ import axios from "axios";
 import { VITE_API_URL } from "@/utils/constants";
 
 const Logout = () => {
-    const { token, user, setToken } = useAuth();
+    const { token, setToken } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -23,12 +23,15 @@ const Logout = () => {
 
                 if (response.status === 200) {
                     setToken(null);
+                    localStorage.removeItem("token");
                     navigate("/login", { replace: true });
                 } else {
                     alert("An error occurred: " + response.data.message);
+                    navigate("/login", { replace: true });
                 }
             } catch (error) {
                 console.error("Logout error:", error);
+                navigate("/", { replace: true });
             }
         };
 
